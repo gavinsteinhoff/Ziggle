@@ -1,12 +1,20 @@
+using AutoMapper;
+using Azure.Core.Serialization;
+using System.Text.Json;
+
 namespace Ziggle.Api.Endpoints;
 
 public class SecretSantaEndpoints
 {
     private readonly ILogger _logger;
+    private readonly IMapper _mapper;
 
-    public SecretSantaEndpoints(ILoggerFactory loggerFactory)
+    public SecretSantaEndpoints(
+        ILoggerFactory loggerFactory,
+        IMapper mapper)
     {
         _logger = loggerFactory.CreateLogger<SecretSantaEndpoints>();
+        _mapper = mapper;
     }
 
     [Function(nameof(SantaList))]
@@ -23,8 +31,7 @@ public class SecretSantaEndpoints
     [Function(nameof(SantaGet))]
     public async Task<HttpResponseData> SantaGet(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = "santa/{id}")] HttpRequestData req,
-        [CosmosDBInput("%CosmosDb%", "%CosmosContainer%", Connection = "CosmosConnection", Id = "{id}", PartitionKey = "santa")] SecretSantaDto item,
-        string id
+        [CosmosDBInput("%CosmosDb%", "%CosmosContainer%", Connection = "CosmosConnection", Id = "{id}", PartitionKey = "santa")] SecretSantaDto item
     )
     {
         var response = req.CreateResponse(HttpStatusCode.OK);
@@ -36,43 +43,10 @@ public class SecretSantaEndpoints
     [CosmosDBOutput("%CosmosDb%", "%CosmosContainer%", Connection = "CosmosConnection", PartitionKey = "santa")]
     public async Task<SecretSantaDto?> SantaPost([HttpTrigger(AuthorizationLevel.Function, "post", Route = "santa")] HttpRequestData req)
     {
-        var newItem = await req.ReadFromJsonAsync<SecretSantaDto>();
-        if (newItem is null)
+        var newItem = await req.ReadFromJsonAsync<SecretSantaNewDto>();
+        if (newItem is null || !newItem.IsValid())
             return null;
-
-        var saveItem = CleanNew(newItem);
-        return saveItem;
-    }
-
-    [Function(nameof(SantaPut))]
-    [CosmosDBOutput("%CosmosDb%", "%CosmosContainer%", Connection = "CosmosConnection", PartitionKey = "santa")]
-    public async Task<SecretSantaDto?> SantaPut(
-        [HttpTrigger(AuthorizationLevel.Function, "put", Route = "santa/{id}")] HttpRequestData req, string id,
-        [CosmosDBInput("%CosmosDb%", "%CosmosContainer%", Connection = "CosmosConnection", SqlQuery = "select * from c where c.id = {id} OFFSET 0 LIMIT 1", PartitionKey = "santa")] List<SecretSantaDto> items
-    )
-    {
-        var newItem = await req.ReadFromJsonAsync<SecretSantaDto>();
-
-        if (newItem is null)
-            return null;
-
-        // Find existing item
-        var item = items.FirstOrDefault(i => i.Id == id);
-
-        // Create if does not exist
-        if (item is null)
-            return CleanNew(newItem);
-
-        if (newItem.Id != id)
-            return null;
-
-        // Error is changing Read-only values
-        if (newItem.GuildId != item.GuildId)
-            return null;
-
-        // TODO: Authorization
-
-        return newItem;
+        return _mapper.Map<SecretSantaDto>(newItem);
     }
 
     [Function(nameof(SantaPatch))]
@@ -101,37 +75,29 @@ public class SecretSantaEndpoints
         if (newItem.GuildId != item.GuildId)
             return null;
 
-        var saveItem = CleanPatch(newItem, item);
+        var saveItem = SetupPatch(newItem, item);
 
         // TODO: Authorization
 
         return saveItem;
     }
 
-    private static SecretSantaDto CleanNew(SecretSantaDto newItem)
-    {
-        var saveItem = new SecretSantaDto
-        {
-            Name = newItem.Name,
-            GuildId = newItem.GuildId,
-            GuildRoleId = newItem.GuildRoleId,
-            Questions = newItem.Questions,
-            Members = newItem.Members,
-        };
-
-        return saveItem;
-    }
-
-    private static SecretSantaDto CleanPatch(SecretSantaDto newItem, SecretSantaDto existingItem)
+    /// <summary>
+    /// Setups an object to use for patching. Will fill in missing fields.
+    /// </summary>
+    /// <param name="newItem">The requested item to save.</param>
+    /// <param name="existingItem">The existing database item.</param>
+    /// <returns>A filled object safe to save.</returns>
+    private static SecretSantaDto SetupPatch(SecretSantaDto newItem, SecretSantaDto existingItem)
     {
         var saveItem = new SecretSantaDto
         {
             Id = existingItem.Id,
             GuildId = existingItem.GuildId,
-            Name = string.IsNullOrEmpty(newItem.Name) ? newItem.Name : newItem.Name,
-            GuildRoleId = string.IsNullOrEmpty(newItem.GuildRoleId) ? existingItem.GuildRoleId : newItem.GuildRoleId,
-            Questions = newItem.Questions.Any() ? newItem.Questions : existingItem.Questions,
-            Members = newItem.Members.Any() ? newItem.Members : existingItem.Members
+            Name = newItem.Name ?? existingItem.Name,
+            GuildRoleId = newItem.GuildRoleId ?? existingItem.GuildRoleId,
+            Questions = newItem.Questions ?? existingItem.Questions,
+            Members = newItem.Members ?? existingItem.Members
         };
 
         return saveItem;
