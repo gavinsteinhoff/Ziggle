@@ -1,9 +1,7 @@
 using AutoMapper;
-using Azure.Core.Serialization;
-using System.Text.Json;
-
 namespace Ziggle.Api.Endpoints;
 
+// TODO: Authentication
 public class SecretSantaEndpoints
 {
     private readonly ILogger _logger;
@@ -46,6 +44,9 @@ public class SecretSantaEndpoints
         var newItem = await req.ReadFromJsonAsync<SecretSantaNewDto>();
         if (newItem is null || !newItem.IsValid())
             return null;
+
+        // TODO: Authorization
+
         return _mapper.Map<SecretSantaDto>(newItem);
     }
 
