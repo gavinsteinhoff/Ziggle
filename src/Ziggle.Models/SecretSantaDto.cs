@@ -22,20 +22,6 @@ public class SecretSantaDto
 
     [JsonPropertyName("members")]
     public List<SecretSantaMemberDto> Members { get; init; } = new();
-
-    public static SecretSantaDto GetNew(SecretSantaDto newItem)
-    {
-        var saveItem = new SecretSantaDto
-        {
-            Name = newItem.Name,
-            GuildId = newItem.GuildId,
-            GuildRoleId = newItem.GuildRoleId,
-            Questions = newItem.Questions,
-            Members = newItem.Members,
-        };
-
-        return saveItem;
-    }
 }
 
 public class SecretSantaMemberDto

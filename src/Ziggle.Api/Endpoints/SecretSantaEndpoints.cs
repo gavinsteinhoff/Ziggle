@@ -40,7 +40,7 @@ public class SecretSantaEndpoints
         if (newItem is null)
             return null;
 
-        var saveItem = SecretSantaDto.GetNew(newItem);
+        var saveItem = CleanNew(newItem);
         return saveItem;
     }
 
@@ -61,12 +61,12 @@ public class SecretSantaEndpoints
 
         // Create if does not exist
         if (item is null)
-            return SecretSantaDto.GetNew(newItem);
+            return CleanNew(newItem);
 
         if (newItem.Id != id)
             return null;
 
-        // Read-only values
+        // Error is changing Read-only values
         if (newItem.GuildId != item.GuildId)
             return null;
 
@@ -97,22 +97,42 @@ public class SecretSantaEndpoints
         if (item is null)
             return null;
 
-        // Read-only values
+        // Error is changing Read-only values
         if (newItem.GuildId != item.GuildId)
             return null;
 
-        // Patch
-
-        var saveItem = new SecretSantaDto
-        {
-            Id = item.Id,
-            Name = string.IsNullOrEmpty(newItem.Name) ? item.Name : newItem.Name,
-            GuildRoleId = string.IsNullOrEmpty(newItem.GuildRoleId) ? item.GuildRoleId : newItem.GuildRoleId,
-            Questions = newItem.Questions.Any() ? newItem.Questions : item.Questions,
-            Members = newItem.Members.Any() ? newItem.Members : item.Members
-        };
+        var saveItem = CleanPatch(newItem, item);
 
         // TODO: Authorization
+
+        return saveItem;
+    }
+
+    private static SecretSantaDto CleanNew(SecretSantaDto newItem)
+    {
+        var saveItem = new SecretSantaDto
+        {
+            Name = newItem.Name,
+            GuildId = newItem.GuildId,
+            GuildRoleId = newItem.GuildRoleId,
+            Questions = newItem.Questions,
+            Members = newItem.Members,
+        };
+
+        return saveItem;
+    }
+
+    private static SecretSantaDto CleanPatch(SecretSantaDto newItem, SecretSantaDto existingItem)
+    {
+        var saveItem = new SecretSantaDto
+        {
+            Id = existingItem.Id,
+            GuildId = existingItem.GuildId,
+            Name = string.IsNullOrEmpty(newItem.Name) ? newItem.Name : newItem.Name,
+            GuildRoleId = string.IsNullOrEmpty(newItem.GuildRoleId) ? existingItem.GuildRoleId : newItem.GuildRoleId,
+            Questions = newItem.Questions.Any() ? newItem.Questions : existingItem.Questions,
+            Members = newItem.Members.Any() ? newItem.Members : existingItem.Members
+        };
 
         return saveItem;
     }
