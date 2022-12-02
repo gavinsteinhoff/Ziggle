@@ -1,0 +1,26 @@
+﻿@page "/callback"
+@using Ziggle.Web.Services;
+@inject NavigationManager _navigationManager
+@inject UserService _userService
+
+@code {
+    protected override async void OnInitialized()
+    {
+        base.OnInitialized();
+        var token = string.Empty;
+        var state = string.Empty;
+        var fragment = _navigationManager.ToAbsoluteUri(_navigationManager.Uri).Fragment.Replace("#", "").Trim();
+        foreach (var f in fragment.Split("&"))
+        {
+            var item = f.Split("=");
+            if (item[0] == "access_token")
+                token = item[1];
+
+            if (item[0] == "state")
+                state = item[1];
+        }
+        await _userService.Login(token);
+        _navigationManager.NavigateTo("/");
+    }
+}
+

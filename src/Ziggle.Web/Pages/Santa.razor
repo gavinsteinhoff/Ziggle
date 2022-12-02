@@ -1,0 +1,14 @@
+﻿@page "/santa"
+@inject NavigationManager NavigationManager
+
+<PageTitle>Ziggle Secret Santa</PageTitle>
+<MudButton @onclick="Login">Login</MudButton>
+
+@code {
+
+    private void Login()
+    {
+        var loginLink = "https://discord.com/oauth2/authorize?response_type=token&client_id=823285868420268032&scope=identify%20guilds&state=15773059ghq9183habn&redirect_uri=https://localhost:44398/callback&prompt=consent";
+        NavigationManager.NavigateTo(loginLink);
+    }
+}

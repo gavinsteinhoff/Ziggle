@@ -9,15 +9,15 @@ public class SecretSantaDto : SecretSantaNewDto
 
     [JsonPropertyName("kind")]
     public string Kind { get => "santa"; }
+
+    [JsonPropertyName("guildId")]
+    public string? GuildId { get; set; }
 }
 
 public class SecretSantaNewDto
 {
     [JsonPropertyName("name")]
     public string? Name { get; init; }
-
-    [JsonPropertyName("guildId")]
-    public string? GuildId { get; init; }
 
     [JsonPropertyName("guildRoleId")]
     public string? GuildRoleId { get; init; }
@@ -32,7 +32,6 @@ public class SecretSantaNewDto
     {
         return
             !string.IsNullOrEmpty(Name) &&
-            !string.IsNullOrEmpty(GuildId) &&
             !string.IsNullOrEmpty(GuildRoleId);
     }
 }

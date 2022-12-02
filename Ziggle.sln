@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ziggle.Api", "src\Ziggle.Ap
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ziggle.Web", "src\Ziggle.Web\Ziggle.Web.csproj", "{5CE8D8B2-B1E6-4AB0-81AB-ED9C7C81F04E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ziggle.Models", "src\Ziggle.Models\Ziggle.Models.csproj", "{61A3B69E-C539-4F5D-84E9-B0CF97CFA624}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ziggle.Models", "src\Ziggle.Models\Ziggle.Models.csproj", "{61A3B69E-C539-4F5D-84E9-B0CF97CFA624}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
