@@ -8,11 +8,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="Discord.Net" Version="3.8.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="7.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.0" PrivateAssets="all" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="3.0.3" />
-		<PackageReference Include="MudBlazor" Version="6.1.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="7.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.1" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
+		<PackageReference Include="MudBlazor" Version="6.1.6" />
 	</ItemGroup>
 
 	<ItemGroup>
